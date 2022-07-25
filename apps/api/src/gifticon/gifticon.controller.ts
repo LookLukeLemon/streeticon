@@ -1,4 +1,4 @@
-import { JwtAuthGuard } from '@common/common/auth/jwt/jwt-auth.guard';
+import { JwtStoreAuthGuard } from '@common/common/auth/jwt/jwt-store-auth.guard';
 import CreateGifticonDto from '@entity/entity/gifticon/dto/create.gifticon.dto';
 import UpdateGifticonDto from '@entity/entity/gifticon/dto/update.gifticon.dto';
 import {
@@ -21,7 +21,7 @@ import { GifticonService } from './gifticon.service';
 export class GifticonController {
   constructor(private readonly gifticonService: GifticonService) {}
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtStoreAuthGuard)
   @Post()
   async addGifticon(@Body() body: CreateGifticonDto, @Req() req, @Res() res) {
     const newGifticon = await this.gifticonService.addGifticon(body, req.user);
@@ -30,7 +30,7 @@ export class GifticonController {
     });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtStoreAuthGuard)
   @Patch()
   async updateGifticon(
     @Body() body: UpdateGifticonDto,
@@ -48,7 +48,7 @@ export class GifticonController {
     });
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtStoreAuthGuard)
   @Get()
   findGiftcards(
     @Req() req,
@@ -58,7 +58,7 @@ export class GifticonController {
     return this.gifticonService.findAll(req.user, page, perPage);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtStoreAuthGuard)
   @Get(':name')
   findGiftcard(@Req() req, @Param('name') name: string) {
     return this.gifticonService.findOne(req.user, name);

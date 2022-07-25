@@ -1,3 +1,4 @@
+import { SignInDto } from '@common/common/auth/sign-in.dto';
 import { AwsS3Service } from '@common/common/aws-s3/aws-s3.service';
 import { CipherService } from '@common/common/cipher/cipher.service';
 import { StoreEntityService } from '@common/common/store-entity/store-entity.service';
@@ -14,7 +15,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { SignInDto } from './store.controller';
 
 @Injectable()
 export class StoreService {
@@ -75,8 +75,8 @@ export class StoreService {
   async getStore(req: Request) {
     const cookies = req.cookies;
 
-    if (cookies?.jwt) {
-      const refreshToken = cookies.jwt;
+    if (cookies?.['jwt-store']) {
+      const refreshToken = cookies['jwt-store'];
       const foundStore = await this.storeEntityService.findOneByRefreshToken(
         refreshToken,
       );

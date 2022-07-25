@@ -6,8 +6,14 @@ import { StoreEntityModule } from '../store-entity/store-entity.module';
 import { UserEntityModule } from '../user-entity/user-entity.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from './jwt/jwt.strategy';
-import { RefreshJwtStrategy } from './jwt/refresh-jwt.strategy';
+import { JwtStoreAuthGuard } from './jwt/jwt-store-auth.guard';
+import { JwtStoreStrategy } from './jwt/jwt-store.strategy';
+import { JwtUserAuthGuard } from './jwt/jwt-user-auth.guard';
+import { JwtUserStrategy } from './jwt/jwt-user.strategy';
+import { RefreshJwtStoreAuthGuard } from './jwt/refresh-jwt-store-auth.guard';
+import { RefreshJwtStoreStrategy } from './jwt/refresh-jwt-store.strategy';
+import { RefreshJwtUserAuthGuard } from './jwt/refresh-jwt-user-auth.guard';
+import { RefreshJwtUserStrategy } from './jwt/refresh-jwt-user.strategy';
 import { LocalStoreStrategy } from './local/local-store.strategy';
 import { LocalUserStrategy } from './local/local-user.strategy';
 
@@ -33,8 +39,14 @@ import { LocalUserStrategy } from './local/local-user.strategy';
     AuthService,
     LocalUserStrategy,
     LocalStoreStrategy,
-    JwtStrategy,
-    RefreshJwtStrategy,
+    JwtStoreAuthGuard,
+    JwtStoreStrategy,
+    JwtUserAuthGuard,
+    JwtUserStrategy,
+    RefreshJwtStoreAuthGuard,
+    RefreshJwtStoreStrategy,
+    RefreshJwtUserAuthGuard,
+    RefreshJwtUserStrategy,
   ],
   exports: [AuthService],
 })

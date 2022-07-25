@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export default class UserDto {
+export default class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   email;
@@ -11,7 +11,7 @@ export default class UserDto {
 
   @IsString()
   @IsNotEmpty()
-  image;
+  password;
 
   @IsString()
   @IsNotEmpty()
@@ -20,19 +20,4 @@ export default class UserDto {
   @IsString()
   @IsNotEmpty()
   region;
-
-  @IsString()
-  @IsNotEmpty()
-  address;
-
-  @IsString()
-  desc;
-
-  @IsString()
-  @IsNotEmpty()
-  phone;
-
-  @IsString()
-  @IsNotEmpty()
-  createdAt;
 }

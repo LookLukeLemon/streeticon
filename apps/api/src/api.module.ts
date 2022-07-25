@@ -9,6 +9,7 @@ import { AllExceptionsFilter } from '@common/common/exception-filter/all-excepti
 import { AuthModule } from '@common/common/auth/auth.module';
 import { StoreModule } from './store/store.module';
 import { GifticonModule } from './gifticon/gifticon.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { GifticonModule } from './gifticon/gifticon.module';
     AuthModule,
     StoreModule,
     GifticonModule,
+    UserModule,
   ],
   controllers: [ApiController],
   providers: [

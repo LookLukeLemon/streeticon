@@ -2,22 +2,22 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { StoreEntityService } from '@common/common/store-entity/store-entity.service';
-import { JwtPayload } from './jwt.strategy';
+import { JwtPayload } from './jwt-payload';
+import { UserEntityService } from '@common/common/user-entity/user-entity.service';
 
 @Injectable()
-export class RefreshJwtStrategy extends PassportStrategy(
+export class RefreshJwtUserStrategy extends PassportStrategy(
   Strategy,
-  'jwt-refresh',
+  'jwt-refresh-user',
 ) {
   constructor(
-    private readonly configService: ConfigService,
-    readonly storeEntityService: StoreEntityService,
+    readonly configService: ConfigService,
+    readonly userEntityService: UserEntityService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request) => {
-          return request?.cookies?.jwt;
+          return request?.cookies?.['jwt-user'];
         },
       ]),
       secretOrKey: configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
@@ -26,11 +26,11 @@ export class RefreshJwtStrategy extends PassportStrategy(
   }
 
   async validate(req, payload: JwtPayload) {
-    const refreshToken = req.cookies?.jwt;
-    const foundStore = await this.storeEntityService.findOneByRefreshToken(
+    const refreshToken = req.cookies?.['jwt-user'];
+    const foundUser = await this.userEntityService.findOneByRefreshToken(
       refreshToken,
     );
 
-    return foundStore?.dto;
+    return foundUser?.dto;
   }
 }
