@@ -11,6 +11,10 @@ export default class UserDto {
 
   @IsString()
   @IsNotEmpty()
+  nickname;
+
+  @IsString()
+  @IsNotEmpty()
   image;
 
   @IsString()

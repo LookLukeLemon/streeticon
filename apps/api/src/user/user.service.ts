@@ -4,6 +4,7 @@ import { CipherService } from '@common/common/cipher/cipher.service';
 import { UserEntityService } from '@common/common/user-entity/user-entity.service';
 import CreateUserDto from '@entity/entity/user/dto/create.user.dto';
 import UpdateUserDto from '@entity/entity/user/dto/update.user.dto';
+import UpdateUserImageDto from '@entity/entity/user/dto/update.user.image';
 import UserDto from '@entity/entity/user/dto/user.dto';
 import { User } from '@entity/entity/user/user.schema';
 import {
@@ -28,6 +29,7 @@ export class UserService {
     const user = new User();
     user.email = body.email;
     user.name = body.name;
+    user.nickname = body.nickname;
     user.password = hashedPwd;
     user.country = body.country;
     user.region = body.region;
@@ -80,6 +82,15 @@ export class UserService {
 
     foundUser.phone = body.phone ?? foundUser.phone;
     foundUser.address = body.address ?? foundUser.address;
+    foundUser.nickname = body.nickname ?? foundUser.nickname;
+
+    return await this.userEntityService.updateById(foundUser._id, foundUser);
+  }
+
+  async updateImage(body: UpdateUserImageDto) {
+    const foundUser = await this.userEntityService.findOneByEmail(body.email);
+
+    if (!foundUser) throw new ConflictException();
 
     if (body.thumbnailBase64) {
       const { key } = await this.awsS3Service.uploadImageFromBase64(

@@ -9,6 +9,9 @@ export class User {
   @Prop({ required: true, unique: true, type: mongoose.Schema.Types.String })
   email;
 
+  @Prop({ required: true, type: mongoose.Schema.Types.String })
+  nickname: string;
+
   @Prop({ required: true, unique: true, type: mongoose.Schema.Types.String })
   name: string;
 
@@ -55,8 +58,9 @@ export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.virtual('dto').get(function (): UserDto {
   return {
     email: this.email,
-    image: this.image,
+    nickname: this.nickname,
     name: this.name,
+    image: this.image,
     country: this.country,
     region: this.region,
     address: this.address,

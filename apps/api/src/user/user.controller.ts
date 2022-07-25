@@ -3,6 +3,7 @@ import { SignInDto } from '@common/common/auth/sign-in.dto';
 import { Public } from '@common/common/constants';
 import CreateUserDto from '@entity/entity/user/dto/create.user.dto';
 import UpdateUserDto from '@entity/entity/user/dto/update.user.dto';
+import UpdateUserImageDto from '@entity/entity/user/dto/update.user.image';
 import {
   Body,
   Controller,
@@ -45,5 +46,11 @@ export class UserController {
   @Patch('profile')
   updateProfile(@Body() body: UpdateUserDto) {
     return this.userService.updateUser(body);
+  }
+
+  @UseGuards(JwtUserAuthGuard)
+  @Patch('profile/image')
+  updateProfileImage(@Body() body: UpdateUserImageDto) {
+    return this.userService.updateImage(body);
   }
 }

@@ -1,16 +1,10 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export default class UpdateUserDto {
+export default class UpdateUserImageDto {
   @IsString()
   @IsNotEmpty()
   email;
 
   @IsString()
-  nickname;
-
-  @IsString()
-  phone;
-
-  @IsString()
-  address;
+  thumbnailBase64;
 }

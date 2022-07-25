@@ -11,6 +11,10 @@ export default class CreateUserDto {
 
   @IsString()
   @IsNotEmpty()
+  nickname;
+
+  @IsString()
+  @IsNotEmpty()
   password;
 
   @IsString()

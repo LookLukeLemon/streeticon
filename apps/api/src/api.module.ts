@@ -10,6 +10,7 @@ import { AuthModule } from '@common/common/auth/auth.module';
 import { StoreModule } from './store/store.module';
 import { GifticonModule } from './gifticon/gifticon.module';
 import { UserModule } from './user/user.module';
+import { StoryModule } from './story/story.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { UserModule } from './user/user.module';
     StoreModule,
     GifticonModule,
     UserModule,
+    StoryModule,
   ],
   controllers: [ApiController],
   providers: [
