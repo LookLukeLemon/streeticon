@@ -39,7 +39,7 @@ export class ApiController {
   @UseGuards(RefreshJwtUserAuthGuard)
   @Get('auth/user/refresh')
   async refreshUser(@Req() req: Request, @Res() res: Response) {
-    return await this.authService.refreshTokenStore(req, res);
+    return await this.authService.refreshTokenUser(req, res);
   }
 
   @Public()

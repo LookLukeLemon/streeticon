@@ -8,7 +8,6 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const corsWhitelist = process.env.CORS_WHITELIST.split(',');
 
-  console.log(corsWhitelist);
   const app = await NestFactory.create(ApiModule);
   const { httpAdapter } = app.get(HttpAdapterHost);
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
