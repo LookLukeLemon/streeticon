@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { ApiController } from './api.controller';
@@ -11,6 +10,8 @@ import { StoreModule } from './store/store.module';
 import { GifticonModule } from './gifticon/gifticon.module';
 import { UserModule } from './user/user.module';
 import { StoryModule } from './story/story.module';
+import { FeedModule } from './feed/feed.module';
+import { FeedCommentModule } from './feed-comment/feed-comment.module';
 
 @Module({
   imports: [
@@ -38,6 +39,8 @@ import { StoryModule } from './story/story.module';
     GifticonModule,
     UserModule,
     StoryModule,
+    FeedModule,
+    FeedCommentModule,
   ],
   controllers: [ApiController],
   providers: [

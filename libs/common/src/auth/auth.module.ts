@@ -1,9 +1,9 @@
+import { StoreEntityModule } from '@entity/entity/store/store.module';
+import { UserEntityModule } from '@entity/entity/user/user.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
-import { StoreEntityModule } from '../store-entity/store-entity.module';
-import { UserEntityModule } from '../user-entity/user-entity.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStoreAuthGuard } from './jwt/jwt-store-auth.guard';
@@ -19,9 +19,9 @@ import { LocalUserStrategy } from './local/local-user.strategy';
 
 @Module({
   imports: [
-    UserEntityModule,
     PassportModule,
     ConfigModule,
+    UserEntityModule,
     StoreEntityModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

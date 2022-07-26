@@ -1,7 +1,7 @@
-import { User, UserDocument } from '@entity/entity/user/user.schema';
 import { Injectable } from '@nestjs/common';
-import { InjectModel, InjectConnection } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model, ObjectId } from 'mongoose';
+import { User, UserDocument } from './user.schema';
 
 @Injectable()
 export class UserEntityService {
@@ -23,7 +23,7 @@ export class UserEntityService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
+    return this.userModel.find({}, { _id: false }).exec();
   }
 
   async updateByEmail(email: string, updateUser: UserDocument) {

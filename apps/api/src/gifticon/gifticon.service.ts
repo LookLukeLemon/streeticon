@@ -1,10 +1,10 @@
 import { AwsS3Service } from '@common/common/aws-s3/aws-s3.service';
-import { GifticonEntityService } from '@common/common/gifticon-entity/gifticon-entity.service';
-import { StoreEntityService } from '@common/common/store-entity/store-entity.service';
 import CreateGifticonDto from '@entity/entity/gifticon/dto/create.gifticon.dto';
 import UpdateGifticonDto from '@entity/entity/gifticon/dto/update.gifticon.dto';
 import { Gifticon } from '@entity/entity/gifticon/gifticon.schema';
+import { GifticonEntityService } from '@entity/entity/gifticon/gifticon.service';
 import StoreDto from '@entity/entity/store/dto/store.dto';
+import { StoreEntityService } from '@entity/entity/store/store.service';
 
 import {
   ConflictException,

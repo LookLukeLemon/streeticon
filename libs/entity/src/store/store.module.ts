@@ -1,7 +1,7 @@
-import { Store, StoreSchema } from '@entity/entity/store/store.schema';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { StoreEntityService } from './store-entity.service';
+import { Store, StoreSchema } from './store.schema';
+import { StoreEntityService } from './store.service';
 
 @Module({
   providers: [StoreEntityService],

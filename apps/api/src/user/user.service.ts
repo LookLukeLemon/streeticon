@@ -1,12 +1,12 @@
 import { SignInDto } from '@common/common/auth/sign-in.dto';
 import { AwsS3Service } from '@common/common/aws-s3/aws-s3.service';
 import { CipherService } from '@common/common/cipher/cipher.service';
-import { UserEntityService } from '@common/common/user-entity/user-entity.service';
 import CreateUserDto from '@entity/entity/user/dto/create.user.dto';
 import UpdateUserDto from '@entity/entity/user/dto/update.user.dto';
 import UpdateUserImageDto from '@entity/entity/user/dto/update.user.image';
 import UserDto from '@entity/entity/user/dto/user.dto';
 import { User } from '@entity/entity/user/user.schema';
+import { UserEntityService } from '@entity/entity/user/user.service';
 import {
   BadRequestException,
   ConflictException,
