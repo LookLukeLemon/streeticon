@@ -32,4 +32,10 @@ export class FeedEntityService {
     const model = new this.feedModel(newFeed);
     return model.save();
   }
+
+  async findAndIncreaseCommentCount(feedNumber: string, commentCount: number) {
+    return await this.feedModel
+      .findOneAndUpdate({ feedNumber }, { commentCount })
+      .exec();
+  }
 }

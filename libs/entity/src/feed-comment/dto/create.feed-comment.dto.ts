@@ -3,9 +3,9 @@ import { IsNotEmpty, IsString } from 'class-validator';
 export default class CreateFeedCommentDto {
   @IsString()
   @IsNotEmpty()
-  image;
+  feedNumber;
 
   @IsString()
   @IsNotEmpty()
-  desc;
+  comment;
 }
