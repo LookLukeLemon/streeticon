@@ -22,9 +22,10 @@ export class FeedCommentController {
     @Req() req,
     @Res() res,
   ) {
-    const newFeed = await this.feedCommentService.postComment(body, req.user);
-    return res.status(HttpStatus.CREATED).json({
-      newFeed,
-    });
+    const newFeedComment = await this.feedCommentService.postComment(
+      body,
+      req.user,
+    );
+    return res.status(HttpStatus.CREATED).json(newFeedComment);
   }
 }
