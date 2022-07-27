@@ -22,8 +22,10 @@ export class FeedCommentService {
     user: UserDto,
   ): Promise<FeedComment> {
     const foundUser = await this.userEntityService.findOneByEmail(user.email);
-    const commentCount =
-      await this.feedCommentEntityService.getCountByFeedNumber(body.feedNumber);
+    const foundFeed = await this.feedEntityService.findOne(body.feedNumber);
+    const commentCount = await this.feedCommentEntityService.getCount(
+      foundFeed._id,
+    );
 
     if (!foundUser) throw new ConflictException();
 
@@ -32,13 +34,13 @@ export class FeedCommentService {
 
     try {
       await this.feedEntityService.findAndIncreaseCommentCount(
-        body.feedNumber,
+        foundFeed._id,
         commentCount + 1,
       );
 
       const newComment = new FeedComment(
         body.comment,
-        body.feedNumber,
+        foundFeed._id,
         foundUser._id,
       );
       const createdComment = await this.feedCommentEntityService.create(

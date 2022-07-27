@@ -7,10 +7,10 @@ export type FeedCommentDocument = FeedComment & Document;
 
 @Schema({ id: true })
 export class FeedComment {
-  constructor(desc: string, feedNumber: string, userId: ObjectId) {
+  constructor(desc: string, feedId: ObjectId, userId: ObjectId) {
     this.desc = desc;
-    this.feed = feedNumber;
-    this.userId = userId;
+    this.feed = feedId;
+    this.user = userId;
   }
 
   @Prop({
@@ -39,17 +39,17 @@ export class FeedComment {
 
   @Prop({
     required: true,
-    type: mongoose.Schema.Types.String,
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'Feed',
   })
-  feed: string;
+  feed: ObjectId;
 
   @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   })
-  userId: ObjectId;
+  user: ObjectId;
 
   readonly dto: FeedCommentDto;
 }

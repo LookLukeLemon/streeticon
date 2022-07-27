@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { FeedComment, FeedCommentDocument } from './feed-comment.schema';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class FeedCommentEntityService {
     return model.save();
   }
 
-  async getCountByFeedNumber(feedNumber: string): Promise<number> {
-    return this.feedCommentModel.count({ feed: feedNumber }).exec();
+  async getCount(feedId: ObjectId): Promise<number> {
+    return this.feedCommentModel.count({ feed: feedId }).exec();
   }
 }

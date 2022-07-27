@@ -26,7 +26,7 @@ export class GifticonEntityService {
       .find({ storeId }, { _id: false })
       .sort({ createdAt: -1 })
       .skip((page - 1) * perPage)
-      .populate('storeId', '-_id');
+      .populate('storeId', '-_id -password -refreshToken -createdAt');
 
     if (perPage) {
       findQuery.limit(perPage);
