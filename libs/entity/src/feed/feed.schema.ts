@@ -42,6 +42,13 @@ export class Feed {
 
   @Prop({
     required: true,
+    type: mongoose.Schema.Types.String,
+    default: () => new Date().toUTCString(),
+  })
+  updatedAt: string;
+
+  @Prop({
+    required: true,
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   })
@@ -60,5 +67,6 @@ FeedSchema.virtual('dto').get(function (): FeedDto {
     likeCount: this.likeCount,
     commentCount: this.commentCount,
     createdAt: this.createdAt,
+    updatedAt: this.updatedAt,
   };
 });

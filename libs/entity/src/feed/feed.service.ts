@@ -35,7 +35,10 @@ export class FeedEntityService {
 
   async findAndIncreaseCommentCount(_id: ObjectId, commentCount: number) {
     return await this.feedModel
-      .findOneAndUpdate({ _id }, { commentCount })
+      .findOneAndUpdate(
+        { _id },
+        { commentCount, updatedAt: new Date().toUTCString() },
+      )
       .exec();
   }
 }

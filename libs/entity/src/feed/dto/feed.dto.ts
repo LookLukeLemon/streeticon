@@ -22,4 +22,8 @@ export default class FeedDto {
   @IsString()
   @IsNotEmpty()
   createdAt;
+
+  @IsString()
+  @IsNotEmpty()
+  updatedAt;
 }
