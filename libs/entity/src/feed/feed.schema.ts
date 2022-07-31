@@ -5,7 +5,7 @@ import FeedDto from './dto/feed.dto';
 
 export type FeedDocument = Feed & Document;
 
-@Schema({ id: true })
+@Schema()
 export class Feed {
   constructor(desc: string, image: string, writer: ObjectId) {
     this.desc = desc;
@@ -59,14 +59,11 @@ export class Feed {
 
 export const FeedSchema = SchemaFactory.createForClass(Feed);
 
-FeedSchema.virtual('dto').get(function (): FeedDto {
-  return {
-    feedNumber: this.feedNumber,
-    image: this.image,
-    desc: this.desc,
-    likeCount: this.likeCount,
-    commentCount: this.commentCount,
-    createdAt: this.createdAt,
-    updatedAt: this.updatedAt,
-  };
+FeedSchema.virtual('comments', {
+  ref: 'FeedComment',
+  localField: 'feedNumber',
+  foreignField: 'feed',
 });
+
+FeedSchema.set('toObject', { virtuals: true });
+FeedSchema.set('toJSON', { virtuals: true });

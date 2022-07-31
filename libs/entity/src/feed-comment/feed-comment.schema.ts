@@ -5,9 +5,9 @@ import FeedCommentDto from './dto/feed-comment.dto';
 
 export type FeedCommentDocument = FeedComment & Document;
 
-@Schema({ id: true })
+@Schema()
 export class FeedComment {
-  constructor(desc: string, feedId: ObjectId, userId: ObjectId) {
+  constructor(desc: string, feedId: string, userId: ObjectId) {
     this.desc = desc;
     this.feed = feedId;
     this.user = userId;
@@ -39,10 +39,10 @@ export class FeedComment {
 
   @Prop({
     required: true,
-    type: mongoose.Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.String,
     ref: 'Feed',
   })
-  feed: ObjectId;
+  feed: string;
 
   @Prop({
     required: true,
@@ -56,12 +56,5 @@ export class FeedComment {
 
 export const FeedCommentSchema = SchemaFactory.createForClass(FeedComment);
 
-FeedCommentSchema.virtual('dto').get(function (): FeedCommentDto {
-  return {
-    feedCommentNumber: this.feedCommentNumber,
-    desc: this.desc,
-    likeCount: this.likeCount,
-    commentCount: this.commentCount,
-    createdAt: this.createdAt,
-  };
-});
+FeedCommentSchema.set('toObject', { virtuals: true });
+FeedCommentSchema.set('toJSON', { virtuals: true });

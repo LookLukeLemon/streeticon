@@ -40,7 +40,7 @@ export class FeedCommentService {
 
       const newComment = new FeedComment(
         body.comment,
-        foundFeed._id,
+        foundFeed.feedNumber,
         foundUser._id,
       );
       const createdComment = await this.feedCommentEntityService.create(

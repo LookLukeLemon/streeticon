@@ -16,11 +16,17 @@ export class FeedEntityService {
       .find({}, { _id: false })
       .sort({ updatedAt: -1 })
       .skip((page - 1) * perPage)
-      .populate('writer', '-_id -password -refreshToken -createdAt');
+      .populate('writer', '-_id -password -refreshToken -createdAt')
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'user',
+          select: '-_id name nickname',
+        },
+      });
 
     const items = await findQuery;
     const total = await this.feedModel.find().count();
-
     return { items, total };
   }
 
