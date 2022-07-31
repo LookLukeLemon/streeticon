@@ -14,7 +14,7 @@ export class FeedEntityService {
   ): Promise<PaginationResult<FeedDocument>> {
     const findQuery = this.feedModel
       .find({}, { _id: false })
-      .sort({ createdAt: -1 })
+      .sort({ updatedAt: -1 })
       .skip((page - 1) * perPage)
       .populate('writer', '-_id -password -refreshToken -createdAt');
 
@@ -35,10 +35,7 @@ export class FeedEntityService {
 
   async findAndIncreaseCommentCount(_id: ObjectId, commentCount: number) {
     return await this.feedModel
-      .findOneAndUpdate(
-        { _id },
-        { commentCount, updatedAt: new Date().toUTCString() },
-      )
+      .findOneAndUpdate({ _id }, { commentCount })
       .exec();
   }
 }
