@@ -1,5 +1,5 @@
-import { JwtAuthGuard } from '@common/common/auth/jwt/jwt-auth.guard';
-import { CipherService } from '@common/common/cipher/cipher.service';
+import { JwtStoreAuthGuard } from '@common/common/auth/jwt/jwt-store-auth.guard';
+import { SignInDto } from '@common/common/auth/sign-in.dto';
 import { Public } from '@common/common/constants';
 import CreateStoreDto from '@entity/entity/store/dto/create.store.dto';
 import UpdateStoreDto from '@entity/entity/store/dto/update.store.dto';
@@ -14,19 +14,8 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { IsNotEmpty, IsString } from 'class-validator';
 import { Request } from 'express';
 import { StoreService } from './store.service';
-
-export class SignInDto {
-  @IsString()
-  @IsNotEmpty()
-  id: string;
-
-  @IsString()
-  @IsNotEmpty()
-  password: string;
-}
 
 @Controller('store')
 export class StoreController {
@@ -47,13 +36,13 @@ export class StoreController {
     return this.storeService.signIn(body);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtStoreAuthGuard)
   @Get('profile')
   getProfile(@Req() req: Request) {
     return this.storeService.getStore(req);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtStoreAuthGuard)
   @Patch('profile')
   updateProfile(@Body() body: UpdateStoreDto) {
     return this.storeService.updateStore(body);

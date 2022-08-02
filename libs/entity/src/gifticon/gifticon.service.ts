@@ -1,16 +1,12 @@
-import {
-  Gifticon,
-  GifticonDocument,
-} from '@entity/entity/gifticon/gifticon.schema';
-import { PaginationResult } from '@entity/entity/pagination-result';
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { Connection, Model, ObjectId } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, ObjectId } from 'mongoose';
+import { PaginationResult } from '../pagination-result';
+import { Gifticon, GifticonDocument } from './gifticon.schema';
 
 @Injectable()
 export class GifticonEntityService {
   constructor(
-    @InjectConnection() private connection: Connection,
     @InjectModel(Gifticon.name) private gifticonModel: Model<GifticonDocument>,
   ) {}
 
@@ -27,10 +23,10 @@ export class GifticonEntityService {
     perPage: number,
   ): Promise<PaginationResult<GifticonDocument>> {
     const findQuery = this.gifticonModel
-      .find({ storeId })
-      .sort({ _id: 1 })
+      .find({ storeId }, { _id: false })
+      .sort({ createdAt: -1 })
       .skip((page - 1) * perPage)
-      .populate('storeId');
+      .populate('storeId', '-_id -password -refreshToken -createdAt');
 
     if (perPage) {
       findQuery.limit(perPage);

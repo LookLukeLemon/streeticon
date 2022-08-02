@@ -10,7 +10,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { TokenExpiredError } from 'jsonwebtoken';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
+export class JwtStoreAuthGuard extends AuthGuard('jwt-store') {
   constructor(private reflector: Reflector) {
     super();
   }
@@ -20,6 +20,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       context.getHandler(),
       context.getClass(),
     ]);
+
     if (isPublic) {
       return true;
     }

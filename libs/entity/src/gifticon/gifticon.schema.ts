@@ -39,7 +39,7 @@ export class Gifticon {
   @Prop({
     required: true,
     type: mongoose.Schema.Types.String,
-    default: new Date().toUTCString(),
+    default: () => new Date().toUTCString(),
   })
   createdAt: string;
 

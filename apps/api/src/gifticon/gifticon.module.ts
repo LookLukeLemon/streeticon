@@ -1,10 +1,10 @@
 import { AwsS3Module } from '@common/common/aws-s3/aws-s3.module';
-import { GifticonEntityModule } from '@common/common/gifticon-entity/gifticon-entity.module';
-import { StoreEntityModule } from '@common/common/store-entity/store-entity.module';
+import { GifticonEntityModule } from '@entity/entity/gifticon/gifticon.module';
 import {
   Gifticon,
   GifticonSchema,
 } from '@entity/entity/gifticon/gifticon.schema';
+import { StoreEntityModule } from '@entity/entity/store/store.module';
 import { Store, StoreSchema } from '@entity/entity/store/store.schema';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';

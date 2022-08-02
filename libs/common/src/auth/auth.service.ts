@@ -4,13 +4,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserEntityService } from '../user-entity/user-entity.service';
 import * as bcrypt from 'bcrypt';
 import { Store } from '@entity/entity/store/store.schema';
 import StoreDto from '@entity/entity/store/dto/store.dto';
-import { StoreEntityService } from '../store-entity/store-entity.service';
 import { Request, Response } from 'express';
-import { JwtPayload } from './jwt/jwt.strategy';
+import UserDto from '@entity/entity/user/dto/user.dto';
+import { User } from '@entity/entity/user/user.schema';
+import { JwtPayload } from './jwt/jwt-payload';
+import { StoreEntityService } from '@entity/entity/store/store.service';
+import { UserEntityService } from '@entity/entity/user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -20,14 +22,17 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async validateUser(name: string, pwd: string): Promise<any> {
-    const user = await this.userEntityService.findOne(name);
+  async validateUser(email: string, pwd: string): Promise<User> {
+    const user = await this.userEntityService.findOneByEmail(email);
+    if (!user) throw new NotFoundException();
 
-    if (user && user.password === pwd) {
-      const { password, ...result } = user;
-      return result;
+    const isValid = await bcrypt.compare(pwd, user.password);
+
+    if (isValid) {
+      return user;
+    } else {
+      throw new UnauthorizedException();
     }
-    return null;
   }
 
   async validateStore(name: string, pwd: string): Promise<Store> {
@@ -43,25 +48,225 @@ export class AuthService {
     }
   }
 
+  //공통 Local 로긴
   async signIn(user: any) {
-    const payload = { name: user.name, sub: user.userId };
+    const payload = { name: user.name, sub: user.businessId };
     return {
       access_token: this.jwtService.sign(payload),
     };
   }
 
+  async signOutUser(req: Request, res: Response) {
+    const cookies = req.cookies;
+
+    if (!cookies?.['jwt-user']) return res.sendStatus(204);
+    const refreshToken = cookies['jwt-user'];
+
+    const foundUser = await this.userEntityService.findOneByRefreshToken(
+      refreshToken,
+    );
+
+    if (!foundUser) {
+      res.clearCookie('jwt-user', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      });
+      return res.sendStatus(204);
+    }
+
+    foundUser.refreshToken = foundUser.refreshToken.filter(
+      (rt) => rt !== refreshToken,
+    );
+
+    await this.userEntityService.updateByEmail(foundUser.email, foundUser);
+    res.clearCookie('jwt-user', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
+    res.sendStatus(204);
+  }
+
+  async signInUser(req: Request, res: Response, user: UserDto) {
+    const cookies = req.cookies;
+    const foundUser = await this.userEntityService.findOneByEmail(user.email);
+
+    if (!foundUser) return res.sendStatus(401);
+
+    const payload: JwtPayload = {
+      name: user.name,
+      sub: user.email,
+      image: user.image,
+    };
+
+    const refreshPayload: JwtPayload = {
+      name: user.name,
+      sub: user.email,
+      image: user.image,
+    };
+
+    const access_token = this.jwtService.sign(payload);
+    const newRefreshToken = this.jwtService.sign(refreshPayload, {
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+    });
+
+    let newRefreshTokenArray = !cookies?.['jwt-user']
+      ? foundUser.refreshToken
+      : foundUser.refreshToken.filter((rt) => rt !== cookies['jwt-user']);
+
+    if (cookies?.['jwt-user']) {
+      /* Scenario added here: 
+          1) User logs in but never uses RT and does not logout 
+          2) RT is stolen
+          3) If 1 & 2, reuse detection is needed to clear all RTs when user logs in
+      */
+      const refreshToken = cookies['jwt-user'];
+      const foundToken = await this.userEntityService.findOneByRefreshToken(
+        refreshToken,
+      );
+
+      // Detected refresh token reuse!
+      if (!foundToken) {
+        // clear out ALL previous refresh tokens
+        newRefreshTokenArray = [];
+      }
+
+      res.clearCookie('jwt-user', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+      });
+    }
+
+    // Saving refreshToken with current user
+    foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+
+    const result = await this.userEntityService.updateByEmail(
+      foundUser.email,
+      foundUser,
+    );
+
+    // Creates Secure Cookie with refresh token
+    res.cookie('jwt-user', newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    // res.setHeader('Authorization', 'Bearer ' + access_token);
+
+    // Send authorization roles and access token to user
+    return res.json({ access_token });
+  }
+
+  async refreshTokenUser(req: Request, res: Response) {
+    const cookies = req.cookies;
+
+    if (!cookies?.['jwt-user']) return res.sendStatus(401);
+    const refreshToken = cookies['jwt-user'];
+    res.clearCookie('jwt-user', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
+    const foundUser = await this.userEntityService.findOneByRefreshToken(
+      refreshToken,
+    );
+
+    // Detected refresh token reuse!
+    if (!foundUser) {
+      const verified = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+      });
+
+      if (verified) {
+        const hackedStore = await this.userEntityService.findOneByEmail(
+          verified.email,
+        );
+
+        hackedStore.refreshToken = [];
+
+        const result = await this.userEntityService.updateByEmail(
+          hackedStore.email,
+          hackedStore,
+        );
+      } else {
+        return res.sendStatus(403);
+      }
+      return res.sendStatus(403); //Forbidden
+    }
+
+    const newRefreshTokenArray = foundUser.refreshToken.filter(
+      (rt) => rt !== refreshToken,
+    );
+
+    const verified: JwtPayload = this.jwtService.verify(refreshToken, {
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+    });
+
+    if (!verified) {
+      foundUser.refreshToken = [...newRefreshTokenArray];
+      const result = await this.userEntityService.updateByEmail(
+        foundUser.email,
+        foundUser,
+      );
+    } else {
+      if (foundUser.email !== verified['sub']) {
+        return res.sendStatus(403);
+      }
+
+      // Refresh token was still valid
+      const payload: JwtPayload = {
+        name: verified.name,
+        sub: verified.sub,
+        image: verified.image,
+      };
+
+      const refreshPayload: JwtPayload = {
+        name: foundUser.name,
+        sub: foundUser.email,
+        image: foundUser.image,
+      };
+
+      const access_token = this.jwtService.sign(payload);
+      const newRefreshToken = this.jwtService.sign(refreshPayload, {
+        secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+      });
+
+      // Saving refreshToken with current store
+      foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+      const result = await this.userEntityService.updateByEmail(
+        foundUser.email,
+        foundUser,
+      );
+
+      // Creates Secure Cookie with refresh token
+      res.cookie('jwt-user', newRefreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+      res.json({ access_token });
+    }
+  }
+
   async signOutStore(req: Request, res: Response) {
     const cookies = req.cookies;
 
-    if (!cookies?.jwt) return res.sendStatus(204);
-    const refreshToken = cookies.jwt;
+    if (!cookies?.['jwt-store']) return res.sendStatus(204);
+    const refreshToken = cookies['jwt-store'];
 
     const foundStore = await this.storeEntityService.findOneByRefreshToken(
       refreshToken,
     );
 
     if (!foundStore) {
-      res.clearCookie('jwt', {
+      res.clearCookie('jwt-store', {
         httpOnly: true,
         sameSite: 'none',
         secure: true,
@@ -77,7 +282,11 @@ export class AuthService {
       foundStore.businessId,
       foundStore,
     );
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
+    res.clearCookie('jwt-store', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
     res.sendStatus(204);
   }
 
@@ -107,17 +316,17 @@ export class AuthService {
       expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
     });
 
-    let newRefreshTokenArray = !cookies?.jwt
+    let newRefreshTokenArray = !cookies?.['jwt-store']
       ? foundStore.refreshToken
-      : foundStore.refreshToken.filter((rt) => rt !== cookies.jwt);
+      : foundStore.refreshToken.filter((rt) => rt !== cookies['jwt-store']);
 
-    if (cookies?.jwt) {
+    if (cookies?.['jwt-store']) {
       /* Scenario added here: 
           1) User logs in but never uses RT and does not logout 
           2) RT is stolen
           3) If 1 & 2, reuse detection is needed to clear all RTs when user logs in
       */
-      const refreshToken = cookies.jwt;
+      const refreshToken = cookies['jwt-store'];
       const foundToken = await this.storeEntityService.findOneByRefreshToken(
         refreshToken,
       );
@@ -128,7 +337,7 @@ export class AuthService {
         newRefreshTokenArray = [];
       }
 
-      res.clearCookie('jwt', {
+      res.clearCookie('jwt-store', {
         httpOnly: true,
         sameSite: 'none',
         secure: true,
@@ -144,7 +353,7 @@ export class AuthService {
     );
 
     // Creates Secure Cookie with refresh token
-    res.cookie('jwt', newRefreshToken, {
+    res.cookie('jwt-store', newRefreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
@@ -157,12 +366,16 @@ export class AuthService {
     return res.json({ access_token });
   }
 
-  async refreshToken(req: Request, res: Response) {
+  async refreshTokenStore(req: Request, res: Response) {
     const cookies = req.cookies;
 
-    if (!cookies?.jwt) return res.sendStatus(401);
-    const refreshToken = cookies.jwt;
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
+    if (!cookies?.['jwt-store']) return res.sendStatus(401);
+    const refreshToken = cookies['jwt-store'];
+    res.clearCookie('jwt-store', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: true,
+    });
     const foundStore = await this.storeEntityService.findOneByRefreshToken(
       refreshToken,
     );
@@ -236,7 +449,7 @@ export class AuthService {
       );
 
       // Creates Secure Cookie with refresh token
-      res.cookie('jwt', newRefreshToken, {
+      res.cookie('jwt-store', newRefreshToken, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',

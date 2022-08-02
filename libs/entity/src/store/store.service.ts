@@ -1,12 +1,11 @@
-import { Store, StoreDocument } from '@entity/entity/store/store.schema';
 import { Injectable } from '@nestjs/common';
-import { InjectModel, InjectConnection } from '@nestjs/mongoose';
-import { Connection, Model, ObjectId } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, ObjectId } from 'mongoose';
+import { Store, StoreDocument } from './store.schema';
 
 @Injectable()
 export class StoreEntityService {
   constructor(
-    @InjectConnection() private connection: Connection,
     @InjectModel(Store.name) private storeModel: Model<StoreDocument>,
   ) {}
 
@@ -29,7 +28,7 @@ export class StoreEntityService {
   }
 
   async findAll(): Promise<StoreDocument[]> {
-    return this.storeModel.find().exec();
+    return this.storeModel.find({}, { _id: false }).exec();
   }
 
   async updateByBusinessId(businessId: string, updateStore: StoreDocument) {
