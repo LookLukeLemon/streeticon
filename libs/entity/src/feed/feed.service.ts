@@ -19,9 +19,10 @@ export class FeedEntityService {
       .populate('writer', '-_id -password -refreshToken -createdAt')
       .populate({
         path: 'comments',
+        select: '-_id',
         populate: {
           path: 'user',
-          select: '-_id name nickname',
+          select: '-_id name nickname image country region',
         },
       });
 

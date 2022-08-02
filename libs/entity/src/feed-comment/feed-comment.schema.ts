@@ -40,6 +40,13 @@ export class FeedComment {
   @Prop({
     required: true,
     type: mongoose.Schema.Types.String,
+    default: () => new Date().toUTCString(),
+  })
+  updatedAt: string;
+
+  @Prop({
+    required: true,
+    type: mongoose.Schema.Types.String,
     ref: 'Feed',
   })
   feed: string;
