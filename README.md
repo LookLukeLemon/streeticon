@@ -1,1 +1,1 @@
-![Streeticon](public/streeticon.svg)
+![Streeticon](public/streeticon_diagram.png)
