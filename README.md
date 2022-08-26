@@ -1,1 +1,1 @@
-Streeticon!
+![Streeticon](public/streeticon.png)
