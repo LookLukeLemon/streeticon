@@ -207,52 +207,53 @@ export class AuthService {
       secret: process.env.JWT_REFRESH_TOKEN_SECRET,
     });
 
+    // if it is expired
     if (!verified) {
       foundUser.refreshToken = [...newRefreshTokenArray];
       const result = await this.userEntityService.updateByEmail(
         foundUser.email,
         foundUser,
       );
-    } else {
-      if (foundUser.email !== verified['sub']) {
-        return res.sendStatus(403);
-      }
-
-      // Refresh token was still valid
-      const payload: JwtPayload = {
-        name: verified.name,
-        sub: verified.sub,
-        image: verified.image,
-      };
-
-      const refreshPayload: JwtPayload = {
-        name: foundUser.name,
-        sub: foundUser.email,
-        image: foundUser.image,
-      };
-
-      const access_token = this.jwtService.sign(payload);
-      const newRefreshToken = this.jwtService.sign(refreshPayload, {
-        secret: process.env.JWT_REFRESH_TOKEN_SECRET,
-        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
-      });
-
-      // Saving refreshToken with current store
-      foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-      const result = await this.userEntityService.updateByEmail(
-        foundUser.email,
-        foundUser,
-      );
-
-      // Creates Secure Cookie with refresh token
-      res.cookie('jwt-user', newRefreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        maxAge: 24 * 60 * 60 * 1000,
-      });
-      res.json({ access_token });
     }
+
+    if (foundUser.email !== verified['sub']) {
+      return res.sendStatus(403);
+    }
+
+    // Refresh token was still valid
+    const payload: JwtPayload = {
+      name: verified.name,
+      sub: verified.sub,
+      image: verified.image,
+    };
+
+    const refreshPayload: JwtPayload = {
+      name: foundUser.name,
+      sub: foundUser.email,
+      image: foundUser.image,
+    };
+
+    const access_token = this.jwtService.sign(payload);
+    const newRefreshToken = this.jwtService.sign(refreshPayload, {
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+    });
+
+    // Saving refreshToken with current store
+    foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+    const result = await this.userEntityService.updateByEmail(
+      foundUser.email,
+      foundUser,
+    );
+
+    // Creates Secure Cookie with refresh token
+    res.cookie('jwt-user', newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.json({ access_token });
   }
 
   async signOutStore(req: Request, res: Response) {
@@ -417,45 +418,45 @@ export class AuthService {
         foundStore.businessId,
         foundStore,
       );
-    } else {
-      if (foundStore.businessId !== verified['sub']) {
-        return res.sendStatus(403);
-      }
-
-      // Refresh token was still valid
-      const payload: JwtPayload = {
-        name: verified.name,
-        sub: verified.sub,
-        image: verified.image,
-      };
-
-      const refreshPayload: JwtPayload = {
-        name: foundStore.name,
-        sub: foundStore.businessId,
-        image: foundStore.image,
-      };
-
-      const access_token = this.jwtService.sign(payload);
-      const newRefreshToken = this.jwtService.sign(refreshPayload, {
-        secret: process.env.JWT_REFRESH_TOKEN_SECRET,
-        expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
-      });
-
-      // Saving refreshToken with current store
-      foundStore.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-      const result = await this.storeEntityService.updateByBusinessId(
-        foundStore.businessId,
-        foundStore,
-      );
-
-      // Creates Secure Cookie with refresh token
-      res.cookie('jwt-store', newRefreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        maxAge: 24 * 60 * 60 * 1000,
-      });
-      res.json({ access_token });
     }
+
+    if (foundStore.businessId !== verified['sub']) {
+      return res.sendStatus(403);
+    }
+
+    // Refresh token was still valid
+    const payload: JwtPayload = {
+      name: verified.name,
+      sub: verified.sub,
+      image: verified.image,
+    };
+
+    const refreshPayload: JwtPayload = {
+      name: foundStore.name,
+      sub: foundStore.businessId,
+      image: foundStore.image,
+    };
+
+    const access_token = this.jwtService.sign(payload);
+    const newRefreshToken = this.jwtService.sign(refreshPayload, {
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+      expiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+    });
+
+    // Saving refreshToken with current store
+    foundStore.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+    const result = await this.storeEntityService.updateByBusinessId(
+      foundStore.businessId,
+      foundStore,
+    );
+
+    // Creates Secure Cookie with refresh token
+    res.cookie('jwt-store', newRefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.json({ access_token });
   }
 }
