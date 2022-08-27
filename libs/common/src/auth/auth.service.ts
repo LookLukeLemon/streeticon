@@ -1,3 +1,9 @@
+import StoreDto from '@entity/entity/store/dto/store.dto';
+import { Store } from '@entity/entity/store/store.schema';
+import { StoreEntityService } from '@entity/entity/store/store.service';
+import UserDto from '@entity/entity/user/dto/user.dto';
+import { User } from '@entity/entity/user/user.schema';
+import { UserEntityService } from '@entity/entity/user/user.service';
 import {
   Injectable,
   NotFoundException,
@@ -5,14 +11,8 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { Store } from '@entity/entity/store/store.schema';
-import StoreDto from '@entity/entity/store/dto/store.dto';
 import { Request, Response } from 'express';
-import UserDto from '@entity/entity/user/dto/user.dto';
-import { User } from '@entity/entity/user/user.schema';
 import { JwtPayload } from './jwt/jwt-payload';
-import { StoreEntityService } from '@entity/entity/store/store.service';
-import { UserEntityService } from '@entity/entity/user/user.service';
 
 @Injectable()
 export class AuthService {
@@ -183,15 +183,15 @@ export class AuthService {
       });
 
       if (verified) {
-        const hackedStore = await this.userEntityService.findOneByEmail(
+        const hackedUser = await this.userEntityService.findOneByEmail(
           verified.email,
         );
 
-        hackedStore.refreshToken = [];
+        hackedUser.refreshToken = [];
 
         const result = await this.userEntityService.updateByEmail(
-          hackedStore.email,
-          hackedStore,
+          hackedUser.email,
+          hackedUser,
         );
       } else {
         return res.sendStatus(403);
