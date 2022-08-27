@@ -1,2 +1,2 @@
 ### 👏 Streeticon Architecture
-![Streeticon](public/streeticon_diagram.png)
+![Streeticon](public/streeticon_architecture.png)
